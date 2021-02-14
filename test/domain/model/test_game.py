@@ -75,6 +75,16 @@ class TestGame(unittest.TestCase):
         self.assertEqual(len(player.hand.hand), 0)
         self.assertEqual(len(self.game.card_deck.deck), self.num_card)
 
+    def send_card_to_dealer(self):
+        card = self.game.card_deck.deck[0]
+        flag = self.game.send_card(self.game.dealer, card)
+
+        self.assertTrue(flag)
+        self.assertEqual(len(self.game.dealer.hand.hand), 1)
+        self.assertEqual(self.game.dealer.hand.hand[0], card)
+        self.assertEqual(len(self.game.card_deck.deck), self.num_card - 1)
+
+
     def distribute_card_that_exist_with_specified_suit_and_rank(self):
         player = self.game.players[0]
         flag = self.game.distribute_card(player, Suit.SPADE, Rank.TWO)
@@ -83,6 +93,15 @@ class TestGame(unittest.TestCase):
         self.assertEqual(len(player.hand.hand), 1)
         self.assertEqual(player.hand.hand[0], Card(Suit.SPADE, Rank.TWO))
         self.assertEqual(len(self.game.card_deck.deck), self.num_card - 1)
+
+    def distribute_card_to_dealer(self):
+        flag = self.game.distribute_card(self.game.dealer, Suit.SPADE, Rank.TWO)
+
+        self.assertTrue(flag)
+        self.assertEqual(len(self.game.dealer.hand.hand), 1)
+        self.assertEqual(self.game.dealer.hand.hand[0], Card(Suit.SPADE, Rank.TWO))
+        self.assertEqual(len(self.game.card_deck.deck), self.num_card - 1)
+
 
     def distribute_card_that_exist_with_specified_suit(self):
         player = self.game.players[0]
@@ -138,7 +157,9 @@ if __name__ == '__main__':
     suite.addTest(TestGame('test_init_round'))
     suite.addTest(TestGame('send_card_that_exist'))
     suite.addTest(TestGame('send_card_that_not_exist_then_return_none'))
+    suite.addTest(TestGame('send_card_to_dealer'))
     suite.addTest(TestGame('distribute_card_that_exist_with_specified_suit_and_rank'))
+    suite.addTest(TestGame('distribute_card_to_dealer'))
     suite.addTest(TestGame('distribute_card_that_exist_with_specified_suit'))
     suite.addTest(TestGame('distribute_card_that_exist_with_specified_rank'))
     suite.addTest(TestGame('distribute_card_that_not_exist_then_return_false'))

@@ -46,20 +46,6 @@ class Game():
             self.players.append(Player(f'Player_{i+2}'))
     
     def distribute_card(self, target: Player, suit: Suit = None, rank: Rank = None) -> bool:
-        # this check should be in game controller
-
-        # # restart game if card deck is empty
-        # if self.card_deck.is_card_deck_empty():
-        #     self.init()
-        #     logging.info('Restarting game because the card deck is empty')
-        #     return False
-
-        # # restart game if remaining cards are not enough for a round
-        # if self.card_deck.cards_remaining() < self.cards_required_each_round:
-        #     self.init()
-        #     logging.info('Restarting game because the card deck does not have enough cards')
-        #     return False
-        
         if suit is not None or rank is not None:
             # distribute a certain card
             card = self.card_deck.search_card(suit, rank)
@@ -93,12 +79,14 @@ class Game():
                 player.status = PlayerStatus.WIN
 
         elif player.hand.status == HandStatus.LIVE:
-            if self.dealer.hand.status == HandStatus.BUST:
-                return True
+            if len(player.hand.hand) < 2 or len(self.dealer.hand.hand) < 2: # unexpected flow
+                player.status = PlayerStatus.UNKNOWN
+            elif self.dealer.hand.status == HandStatus.BUST:
+                player.status = PlayerStatus.WIN
             elif max(player.hand.hand_value) > max(self.dealer.hand.hand_value):
-                return True
+                player.status = PlayerStatus.WIN
             else:
-                return False
+                player.status = PlayerStatus.LOSE
 
         else:
             raise ValueError(f'Unknown HandStatus ({player.hand.status}) for player {player.name}')
