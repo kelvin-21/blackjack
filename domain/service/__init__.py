@@ -1,2 +1,1 @@
-from .config_loader import ConfigLoader
-from .simulator import Simulator
+from .simulator import Simulator, Decision

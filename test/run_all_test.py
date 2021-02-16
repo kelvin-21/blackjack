@@ -5,6 +5,8 @@ from test.domain.model.test_game import TestGame
 from test.domain.model.test_hand import TestHand
 from test.domain.model.test_player import TestPlayer
 
+from test.domain.service.test_simulator import TestSimulator
+
 from test.controller.handler.test_card_input_handler import TestCardInputHandler
 from test.controller.handler.test_card_request_handler import TestCardRequestHandler
 
@@ -19,6 +21,8 @@ def run_all_test():
     TestGame.run_all_test()
     TestHand.run_all_test()
     TestPlayer.run_all_test()
+
+    TestSimulator.run_all_test()
 
     TestCardInputHandler.run_all_test()
     TestCardRequestHandler.run_all_test()
