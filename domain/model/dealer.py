@@ -11,6 +11,8 @@ class Dealer(Player):
         self.hand.init()
     
     def is_request_card(self) -> bool:
+        if not self.can_request_card():
+            return False
         hand_value = max(self.hand.hand_value) # if the Dealer has A, it must be used as 11
         return True if hand_value < self.dealer_min else False
 

@@ -9,14 +9,16 @@ class PlayerStatus(Enum):
     GAME = 'game'
     WIN = 'win'
     LOSE = 'lose'
-    DEALER = 'dealer'
+    DEALER = ''
+    UNKNOWN = 'unknown'
 
 class Player():
-    def __init__(self, name: str):
+    def __init__(self, name: str, is_npc: bool = True):
         self.name = name
         self.hand = Hand()
         self.status = PlayerStatus.GAME
         self.request_card_probi = RequestCardProbability()
+        self.is_npc = is_npc
 
     def init(self):
         self.hand.init()
@@ -29,8 +31,11 @@ class Player():
         self.hand.add_card(card)
         self.update_status()
 
+    def can_request_card(self) -> bool:
+        return self.hand.status == HandStatus.LIVE
+
     def is_request_card(self) -> bool:
-        if self.hand.status != HandStatus.LIVE:
+        if not self.can_request_card():
             return False
 
         if len(self.hand.hand_value) == 1:

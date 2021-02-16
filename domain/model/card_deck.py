@@ -15,7 +15,7 @@ class CardDeck():
                 for rank in Rank:
                     self.add_card(Card(suit, rank))
 
-    def is_card_deck_empty(self) -> bool:
+    def is_empty(self) -> bool:
         return True if len(self.deck) == 0 else False
 
     def search_card(self, suit: Suit = None, rank: Rank = None) -> Card:
@@ -45,7 +45,7 @@ class CardDeck():
         return len(self.deck)
 
     def get_random_card(self) -> Card:
-        if self.is_card_deck_empty():
+        if self.is_empty():
             logging.warning('Unable to get card randomly because the card deck is empty')
             return None
         index = random.randint(0, self.cards_remaining()-1)

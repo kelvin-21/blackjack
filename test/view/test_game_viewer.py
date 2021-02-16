@@ -42,7 +42,7 @@ class TestGameViewer(unittest.TestCase):
 
     def test_players_details(self):
         result = self.game_viewer.players_details(self.dealer, self.players)
-        expected = '[Dealer   ]: dealer - (♠ 10) (♠ 10)\n[test_1   ]: game   - (♠ A)\n[testing_2]: game   - (♠ 10) (♠ A)\n'
+        expected = '[Dealer   ]:      - (♠ 10) (♠ 10)\n[test_1   ]: game - (♠ A)\n[testing_2]: game - (♠ 10) (♠ A)\n'
         self.assertEqual(result, expected)
 
     def test_all_cards(self):
@@ -62,15 +62,19 @@ class TestGameViewer(unittest.TestCase):
         result = self.game_viewer.hand(hand)
         self.assertEqual(result, expected)
 
+    @staticmethod
+    def run_all_test():
+        suite = unittest.TestSuite()
+        suite.addTest(TestGameViewer('test_card'))
+        suite.addTest(TestGameViewer('test_hand'))
+        suite.addTest(TestGameViewer('test_all_hands'))
+        suite.addTest(TestGameViewer('test_players_details'))
+        suite.addTest(TestGameViewer('test_all_cards'))
+
+        runner = unittest.TextTestRunner()
+        runner.run(suite)
+        # print('♠ ♥️ ♣ ♦')
+
 
 if __name__ == '__main__':
-    suite = unittest.TestSuite()
-    suite.addTest(TestGameViewer('test_card'))
-    suite.addTest(TestGameViewer('test_hand'))
-    suite.addTest(TestGameViewer('test_all_hands'))
-    suite.addTest(TestGameViewer('test_players_details'))
-    suite.addTest(TestGameViewer('test_all_cards'))
-
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-    # print('♠ ♥️ ♣ ♦')
+    TestGameViewer.run_all_test()

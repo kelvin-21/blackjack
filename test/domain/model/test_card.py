@@ -53,17 +53,21 @@ class TestCard(unittest.TestCase):
 
         self.assertTrue(result)
 
+    @staticmethod
+    def run_all_test():
+        suite = unittest.TestSuite()
+        suite.addTest(TestCard('card_is_equal_to_itself'))
+        suite.addTest(TestCard('same_cards_with_different_reference_are_equal'))
+        suite.addTest(TestCard('cards_with_different_suit_are_not_equal'))
+        suite.addTest(TestCard('cards_with_different_rank_are_not_equal'))
+        suite.addTest(TestCard('card_is_not_nonequal_to_itself'))
+        suite.addTest(TestCard('same_cards_with_different_reference_are_not_nonequal'))
+        suite.addTest(TestCard('cards_with_different_suit_are_nonequal'))
+        suite.addTest(TestCard('cards_with_different_rank_are_nonequal'))
+
+        runner = unittest.TextTestRunner()
+        runner.run(suite)
+
 
 if __name__ == '__main__':
-    suite = unittest.TestSuite()
-    suite.addTest(TestCard('card_is_equal_to_itself'))
-    suite.addTest(TestCard('same_cards_with_different_reference_are_equal'))
-    suite.addTest(TestCard('cards_with_different_suit_are_not_equal'))
-    suite.addTest(TestCard('cards_with_different_rank_are_not_equal'))
-    suite.addTest(TestCard('card_is_not_nonequal_to_itself'))
-    suite.addTest(TestCard('same_cards_with_different_reference_are_not_nonequal'))
-    suite.addTest(TestCard('cards_with_different_suit_are_nonequal'))
-    suite.addTest(TestCard('cards_with_different_rank_are_nonequal'))
-
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
+    TestCard.run_all_test()

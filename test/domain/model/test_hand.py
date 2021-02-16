@@ -138,23 +138,27 @@ class TestHand(unittest.TestCase):
         self.assertEqual(self.hand.hand_value, [])
         self.assertEqual(self.hand.status, HandStatus.BUST)
 
+    @staticmethod
+    def run_all_test():
+        suite = unittest.TestSuite()
+        suite.addTest(TestHand('test_add_card'))
+        suite.addTest(TestHand('test_add_card_A'))
+        suite.addTest(TestHand('test_add_two_card'))
+        suite.addTest(TestHand('test_add_A_and_add_another_card'))
+        suite.addTest(TestHand('test_add_card_and_add_A'))
+        suite.addTest(TestHand('test_two_A'))
+        suite.addTest(TestHand('test_two_A_different_reference'))
+        suite.addTest(TestHand('test_three_A'))
+        suite.addTest(TestHand('test_add_card_and_two_A'))
+        suite.addTest(TestHand('given_bust_then_return_empty_hand_value'))
+        suite.addTest(TestHand('given_A_as_11_bust_then_use_it_as_1_only'))
+        suite.addTest(TestHand('given_two_A_as_11_bust_then_use_it_as_1_only'))
+        suite.addTest(TestHand('given_five_cards_and_not_bust_then_status_is_fivecard'))
+        suite.addTest(TestHand('given_five_cards_and_bust_then_status_is_bust'))
+
+        runner = unittest.TextTestRunner()
+        runner.run(suite)
+
     
 if __name__ == '__main__':
-    suite = unittest.TestSuite()
-    suite.addTest(TestHand('test_add_card'))
-    suite.addTest(TestHand('test_add_card_A'))
-    suite.addTest(TestHand('test_add_two_card'))
-    suite.addTest(TestHand('test_add_A_and_add_another_card'))
-    suite.addTest(TestHand('test_add_card_and_add_A'))
-    suite.addTest(TestHand('test_two_A'))
-    suite.addTest(TestHand('test_two_A_different_reference'))
-    suite.addTest(TestHand('test_three_A'))
-    suite.addTest(TestHand('test_add_card_and_two_A'))
-    suite.addTest(TestHand('given_bust_then_return_empty_hand_value'))
-    suite.addTest(TestHand('given_A_as_11_bust_then_use_it_as_1_only'))
-    suite.addTest(TestHand('given_two_A_as_11_bust_then_use_it_as_1_only'))
-    suite.addTest(TestHand('given_five_cards_and_not_bust_then_status_is_fivecard'))
-    suite.addTest(TestHand('given_five_cards_and_bust_then_status_is_bust'))
-
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
+    TestHand.run_all_test()

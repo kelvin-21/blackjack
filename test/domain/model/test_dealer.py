@@ -33,13 +33,17 @@ class TestDealer(unittest.TestCase):
 
         self.assertEqual(result, is_request_card)
 
+    @staticmethod
+    def run_all_test():
+        suite = unittest.TestSuite()
+        suite.addTest(TestDealer('dealer_is_created_with_dealer_status'))
+        suite.addTest(TestDealer('given_dealer_bust_then_the_status_is_dealer'))
+        suite.addTest(TestDealer('given_hand_value_less_then_16_then_request_card'))
+        suite.addTest(TestDealer('given_hand_value_greater_then_or_equal_to_16_then_not_request_card'))
+
+        runner = unittest.TextTestRunner()
+        runner.run(suite)
+
 
 if __name__ == '__main__':
-    suite = unittest.TestSuite()
-    suite.addTest(TestDealer('dealer_is_created_with_dealer_status'))
-    suite.addTest(TestDealer('given_dealer_bust_then_the_status_is_dealer'))
-    suite.addTest(TestDealer('given_hand_value_less_then_16_then_request_card'))
-    suite.addTest(TestDealer('given_hand_value_greater_then_or_equal_to_16_then_not_request_card'))
-
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
+    TestDealer.run_all_test()

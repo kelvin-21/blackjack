@@ -49,14 +49,19 @@ class TestPlayer(unittest.TestCase):
 
         self.assertEqual(result, is_request_card)
 
-if __name__ == '__main__':
-    suite = unittest.TestSuite()
-    suite.addTest(TestPlayer('given_player_in_game_status_then_can_add_card'))
-    suite.addTest(TestPlayer('given_win_player_then_cannot_add_card'))
-    suite.addTest(TestPlayer('given_lose_player_then_cannot_add_card'))
-    suite.addTest(TestPlayer('given_player_bust_then_status_is_lose'))
-    suite.addTest(TestPlayer('given_hand_value_less_then_or_equal_to_11_then_request_card'))
-    suite.addTest(TestPlayer('given_hand_value_greater_then_or_equal_to_21_then_not_request_card'))
+    @staticmethod
+    def run_all_test():
+        suite = unittest.TestSuite()
+        suite.addTest(TestPlayer('given_player_in_game_status_then_can_add_card'))
+        suite.addTest(TestPlayer('given_win_player_then_cannot_add_card'))
+        suite.addTest(TestPlayer('given_lose_player_then_cannot_add_card'))
+        suite.addTest(TestPlayer('given_player_bust_then_status_is_lose'))
+        suite.addTest(TestPlayer('given_hand_value_less_then_or_equal_to_11_then_request_card'))
+        suite.addTest(TestPlayer('given_hand_value_greater_then_or_equal_to_21_then_not_request_card'))
 
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
+        runner = unittest.TextTestRunner()
+        runner.run(suite)
+
+
+if __name__ == '__main__':
+    TestPlayer.run_all_test()

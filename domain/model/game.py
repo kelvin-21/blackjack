@@ -7,10 +7,12 @@ import logging
 class Game():
     def __init__(self, config_loader: ConfigLoader):
         self.config_loader = config_loader
+        self.config_loader.load()
         self.players = None
         self.dealer = None
         self.card_deck = None
         self.cards_required_each_round = None
+        self.status = None  # for GameController
 
     def init(self):
         num_player = self.config_loader.num_player
@@ -25,12 +27,13 @@ class Game():
         self.init_game()
 
     def init_game(self) -> None:
-        for player in self.players:
-            player.init()
-        self.dealer.init()
+        self.init_participants()
         self.card_deck.init()
 
     def init_round(self) -> None:
+        self.init_participants()
+
+    def restart_round(self) -> None:
         while self.dealer.hand.hand:
             card = self.dealer.hand.hand.pop()
             self.card_deck.add_card(card)
@@ -38,10 +41,16 @@ class Game():
             while player.hand.hand:
                 card = player.hand.hand.pop()
                 self.card_deck.add_card(card)
+        self.init_participants()
+
+    def init_participants(self) -> None:
+        self.dealer.init()
+        for player in self.players:
+            player.init()
 
     def create_players(self, num_player: int) -> None:
         self.players = list()
-        self.players.append(Player('Me'))
+        self.players.append(Player('Me', is_npc=False))
         for i in range(num_player - 1):
             self.players.append(Player(f'Player_{i+2}'))
     
@@ -64,16 +73,12 @@ class Game():
         else:
             return False
 
-    def conclude_players_status(self) -> None:
-        for player in self.players:
-            self.conclude_player_status(player)
-
     def conclude_player_status(self, player: Player) -> None:
         if player.hand.status == HandStatus.BUST:
             player.status = PlayerStatus.LOSE
 
-        elif player.hand.status in (HandStatus.BLACKJACK, HandStatus.BLACKJACK):
-            if self.dealer.hand.status in (HandStatus.BLACKJACK, HandStatus.BLACKJACK):
+        elif player.hand.status in (HandStatus.BLACKJACK, HandStatus.FIVECARD):
+            if self.dealer.hand.status in (HandStatus.BLACKJACK, HandStatus.FIVECARD):
                 player.status = PlayerStatus.LOSE
             else:
                 player.status = PlayerStatus.WIN
@@ -83,6 +88,8 @@ class Game():
                 player.status = PlayerStatus.UNKNOWN
             elif self.dealer.hand.status == HandStatus.BUST:
                 player.status = PlayerStatus.WIN
+            elif self.dealer.hand.status == HandStatus.BLACKJACK:
+                player.status = PlayerStatus.LOSE
             elif max(player.hand.hand_value) > max(self.dealer.hand.hand_value):
                 player.status = PlayerStatus.WIN
             else:

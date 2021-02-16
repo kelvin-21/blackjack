@@ -21,13 +21,13 @@ class TestCardDeck(unittest.TestCase):
         self.assertEqual(len(self.card_deck.deck), 104)
 
     def given_empty_deck_then_return_true(self):
-        result = self.card_deck.is_card_deck_empty()
+        result = self.card_deck.is_empty()
 
         self.assertTrue(result)
 
     def given_non_empty_deck_then_return_false(self):
         self.card_deck.init()
-        result = self.card_deck.is_card_deck_empty()
+        result = self.card_deck.is_empty()
 
         self.assertFalse(result)
 
@@ -101,23 +101,27 @@ class TestCardDeck(unittest.TestCase):
         card = self.card_deck.get_random_card()
 
         self.assertIsNone(card)
-        
+
+    @staticmethod
+    def run_all_test():
+        suite = unittest.TestSuite()
+        suite.addTest(TestCardDeck('test_add_card'))
+        suite.addTest(TestCardDeck('test_init'))
+        suite.addTest(TestCardDeck('given_empty_deck_then_return_true'))
+        suite.addTest(TestCardDeck('given_non_empty_deck_then_return_false'))
+        suite.addTest(TestCardDeck('given_card_exist_and_search_card_then_return_card'))
+        suite.addTest(TestCardDeck('given_card_not_exist_and_search_card_then_return_none'))
+        suite.addTest(TestCardDeck('given_card_suit_exist_and_search_card_suit_then_return_card'))
+        suite.addTest(TestCardDeck('given_card_suit_not_exist_and_search_card_suit_then_return_none'))
+        suite.addTest(TestCardDeck('given_card_rank_exist_and_search_card_rank_then_return_card'))
+        suite.addTest(TestCardDeck('given_card_rank_not_exist_and_search_card_rank_then_return_none'))
+        suite.addTest(TestCardDeck('test_remove_card'))
+        suite.addTest(TestCardDeck('get_random_card_from_nonempty_card_deck'))
+        suite.addTest(TestCardDeck('get_random_card_from_empty_card_deck_then_return_None'))
+
+        runner = unittest.TextTestRunner()
+        result = runner.run(suite)
+
 
 if __name__ == '__main__':
-    suite = unittest.TestSuite()
-    suite.addTest(TestCardDeck('test_add_card'))
-    suite.addTest(TestCardDeck('test_init'))
-    suite.addTest(TestCardDeck('given_empty_deck_then_return_true'))
-    suite.addTest(TestCardDeck('given_non_empty_deck_then_return_false'))
-    suite.addTest(TestCardDeck('given_card_exist_and_search_card_then_return_card'))
-    suite.addTest(TestCardDeck('given_card_not_exist_and_search_card_then_return_none'))
-    suite.addTest(TestCardDeck('given_card_suit_exist_and_search_card_suit_then_return_card'))
-    suite.addTest(TestCardDeck('given_card_suit_not_exist_and_search_card_suit_then_return_none'))
-    suite.addTest(TestCardDeck('given_card_rank_exist_and_search_card_rank_then_return_card'))
-    suite.addTest(TestCardDeck('given_card_rank_not_exist_and_search_card_rank_then_return_none'))
-    suite.addTest(TestCardDeck('test_remove_card'))
-    suite.addTest(TestCardDeck('get_random_card_from_nonempty_card_deck'))
-    suite.addTest(TestCardDeck('get_random_card_from_empty_card_deck_then_return_None'))
-
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
+    TestCardDeck.run_all_test()
