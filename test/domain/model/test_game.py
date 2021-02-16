@@ -1,6 +1,7 @@
 import unittest
-from domain.model import Game, Card, Suit, Rank, PlayerStatus
+from domain.model import Game, Card, Hand, Suit, Rank, PlayerStatus, PlayerStatusReason, HandStatus
 from domain.service import ConfigLoader
+from typing import List
 
 
 class TestGame(unittest.TestCase):
@@ -149,6 +150,75 @@ class TestGame(unittest.TestCase):
         self.assertEqual(len(player.hand.hand), 0)
         self.assertEqual(len(self.game.card_deck.deck), 0)
 
+    def test_conclude_player_status(self):
+        self.player_status_helper(HandStatus.BUST, HandStatus.LIVE, PlayerStatus.WIN, PlayerStatusReason.DEALER_BUST)
+        self.player_status_helper(HandStatus.BUST, HandStatus.BLACKJACK, PlayerStatus.WIN, PlayerStatusReason.DEALER_BUST)
+        self.player_status_helper(HandStatus.BUST, HandStatus.FIVECARD, PlayerStatus.WIN, PlayerStatusReason.DEALER_BUST)
+        self.player_status_helper(HandStatus.BUST, HandStatus.BUST, PlayerStatus.LOSE, PlayerStatusReason.BUST)
+        self.player_status_helper(HandStatus.BLACKJACK, HandStatus.LIVE, PlayerStatus.LOSE, PlayerStatusReason.DEALER_BLACKJACK)
+        self.player_status_helper(HandStatus.BLACKJACK, HandStatus.BUST, PlayerStatus.LOSE, PlayerStatusReason.DEALER_BLACKJACK)
+        self.player_status_helper(HandStatus.BLACKJACK, HandStatus.BLACKJACK, PlayerStatus.LOSE, PlayerStatusReason.DEALER_BLACKJACK)
+        self.player_status_helper(HandStatus.BLACKJACK, HandStatus.FIVECARD, PlayerStatus.LOSE, PlayerStatusReason.DEALER_BLACKJACK)
+        self.player_status_helper(HandStatus.FIVECARD, HandStatus.LIVE, PlayerStatus.LOSE, PlayerStatusReason.DEALER_FIVECARD)
+        self.player_status_helper(HandStatus.FIVECARD, HandStatus.BUST, PlayerStatus.LOSE, PlayerStatusReason.DEALER_FIVECARD)
+        self.player_status_helper(HandStatus.FIVECARD, HandStatus.BLACKJACK, PlayerStatus.LOSE, PlayerStatusReason.DEALER_FIVECARD)
+        self.player_status_helper(HandStatus.FIVECARD, HandStatus.FIVECARD, PlayerStatus.LOSE, PlayerStatusReason.DEALER_FIVECARD)
+        self.player_status_helper(HandStatus.LIVE, HandStatus.BUST, PlayerStatus.LOSE, PlayerStatusReason.BUST)
+        self.player_status_helper(HandStatus.LIVE, HandStatus.BLACKJACK, PlayerStatus.WIN, PlayerStatusReason.BLACKJACK)
+        self.player_status_helper(HandStatus.LIVE, HandStatus.FIVECARD, PlayerStatus.WIN, PlayerStatusReason.FIVECARD)
+
+    def test_conclude_player_status_hand_value(self):
+        hand_16 = [Card(Suit.SPADE, Rank.TEN), Card(Suit.SPADE, Rank.SIX)]
+        hand_17 = [Card(Suit.SPADE, Rank.TEN), Card(Suit.SPADE, Rank.SEVEN)]
+        hand_21 = [Card(Suit.SPADE, Rank.TEN), Card(Suit.SPADE, Rank.SEVEN), Card(Suit.SPADE, Rank.FOUR)]
+        hand_blackjack = [Card(Suit.SPADE, Rank.TEN), Card(Suit.SPADE, Rank.A)]
+        hand_fivecard = [Card(Suit.SPADE, Rank.TWO), Card(Suit.SPADE, Rank.THREE), Card(Suit.SPADE, Rank.THREE), Card(Suit.SPADE, Rank.FOUR), Card(Suit.SPADE, Rank.FOUR)]
+
+        self.hand_value_helper(hand_16, hand_16, PlayerStatus.LOSE, PlayerStatusReason.DEALER_HAND_VALUE)
+        self.hand_value_helper(hand_16, hand_17, PlayerStatus.WIN, PlayerStatusReason.HAND_VALUE)
+        self.hand_value_helper(hand_17, hand_16, PlayerStatus.LOSE, PlayerStatusReason.DEALER_HAND_VALUE)
+        self.hand_value_helper(hand_21, hand_blackjack, PlayerStatus.WIN, PlayerStatusReason.BLACKJACK)
+        self.hand_value_helper(hand_21, hand_fivecard, PlayerStatus.WIN, PlayerStatusReason.FIVECARD)
+
+    # helper function
+    def player_status_helper(
+        self, 
+        dealer_hand_status: HandStatus, 
+        player_hand_status: HandStatus, 
+        expected_status: PlayerStatus,
+        expected_status_reason: PlayerStatusReason
+    ):
+        self.game.dealer.hand.status = dealer_hand_status
+        self.game.players[0].hand.status = player_hand_status
+        self.game.conclude_player_status(self.game.players[0])
+        status = self.game.players[0].status
+        status_reason = self.game.players[0].status_reason
+        self.assertEqual(status, expected_status)
+        self.assertEqual(status_reason, expected_status_reason)
+
+    # helper function
+    def hand_value_helper(
+        self, 
+        dealer_cards: List[Hand], 
+        player_cards: List[Hand], 
+        expected_status: PlayerStatus, 
+        expected_status_reason: PlayerStatusReason
+    ):
+        dealer = self.game.dealer
+        player = self.game.players[0]
+        dealer.hand.init(), player.hand.init()
+        for card in dealer_cards:
+            dealer.hand.add_card(card)
+        for card in player_cards:
+            player.hand.add_card(card)
+        self.game.conclude_player_status(player)
+        
+        status = player.status
+        status_reason = player.status_reason
+        self.assertEqual(status, expected_status)
+        self.assertEqual(status_reason, expected_status_reason)
+        
+
     @staticmethod
     def run_all_test():
         suite = unittest.TestSuite()
@@ -166,6 +236,8 @@ class TestGame(unittest.TestCase):
         suite.addTest(TestGame('distribute_card_that_not_exist_then_return_false'))
         suite.addTest(TestGame('distribute_random_card_from_nonempty_card_deck'))
         suite.addTest(TestGame('distribute_random_card_from_empty_card_deck_then_return_false'))
+        suite.addTest(TestGame('test_conclude_player_status'))
+        suite.addTest(TestGame('test_conclude_player_status_hand_value'))
 
         runner = unittest.TextTestRunner()
         runner.run(suite)

@@ -1,5 +1,5 @@
-from domain.service import ConfigLoader
-from domain.model import Player, PlayerStatus, Dealer, Card, Suit, Rank, CardDeck, HandStatus
+from domain.model import Player, PlayerStatus, PlayerStatusReason, Dealer, Card, Suit, Rank, CardDeck, HandStatus
+from configuration import ConfigLoader
 import random
 import logging
 
@@ -74,26 +74,49 @@ class Game():
             return False
 
     def conclude_player_status(self, player: Player) -> None:
-        if player.hand.status == HandStatus.BUST:
+        if self.dealer.hand.status == HandStatus.BUST:
+            if player.hand.status == HandStatus.BUST:
+                player.status = PlayerStatus.LOSE
+                player.status_reason = PlayerStatusReason.BUST
+            else:
+                player.status = PlayerStatus.WIN
+                player.status_reason = PlayerStatusReason.DEALER_BUST
+
+        elif self.dealer.hand.status == HandStatus.BLACKJACK:
             player.status = PlayerStatus.LOSE
+            player.status_reason = PlayerStatusReason.DEALER_BLACKJACK
 
-        elif player.hand.status in (HandStatus.BLACKJACK, HandStatus.FIVECARD):
-            if self.dealer.hand.status in (HandStatus.BLACKJACK, HandStatus.FIVECARD):
-                player.status = PlayerStatus.LOSE
-            else:
-                player.status = PlayerStatus.WIN
+        elif self.dealer.hand.status == HandStatus.FIVECARD:
+            player.status = PlayerStatus.LOSE
+            player.status_reason = PlayerStatusReason.DEALER_FIVECARD
 
-        elif player.hand.status == HandStatus.LIVE:
-            if len(player.hand.hand) < 2 or len(self.dealer.hand.hand) < 2: # unexpected flow
-                player.status = PlayerStatus.UNKNOWN
-            elif self.dealer.hand.status == HandStatus.BUST:
+        elif self.dealer.hand.status == HandStatus.LIVE:
+            if player.hand.status == HandStatus.BLACKJACK:
                 player.status = PlayerStatus.WIN
-            elif self.dealer.hand.status == HandStatus.BLACKJACK:
+                player.status_reason = PlayerStatusReason.BLACKJACK
+
+            elif player.hand.status == HandStatus.FIVECARD:
+                player.status = PlayerStatus.WIN
+                player.status_reason = PlayerStatusReason.FIVECARD
+
+            elif player.hand.status == HandStatus.BUST:
                 player.status = PlayerStatus.LOSE
-            elif max(player.hand.hand_value) > max(self.dealer.hand.hand_value):
-                player.status = PlayerStatus.WIN
+                player.status_reason = PlayerStatusReason.BUST
+
+            elif player.hand.status == HandStatus.LIVE:
+                if len(player.hand.hand) < 2 or len(self.dealer.hand.hand) < 2: # unexpected flow
+                    player.status = PlayerStatus.UNKNOWN
+                    player.status_reason = PlayerStatusReason.UNKNOWN
+                else:
+                    if max(player.hand.hand_value) > max(self.dealer.hand.hand_value):
+                        player.status = PlayerStatus.WIN
+                        player.status_reason = PlayerStatusReason.HAND_VALUE
+                    else:
+                        player.status = PlayerStatus.LOSE
+                        player.status_reason = PlayerStatusReason.DEALER_HAND_VALUE
+
             else:
-                player.status = PlayerStatus.LOSE
+                raise ValueError(f'Unknown HandStatus ({player.hand.status}) for player {player.name}')
 
         else:
-            raise ValueError(f'Unknown HandStatus ({player.hand.status}) for player {player.name}')
+            raise ValueError(f'Unknown HandStatus ({self.dealer.hand.status}) for dealer')

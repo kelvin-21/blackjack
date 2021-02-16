@@ -12,17 +12,37 @@ class PlayerStatus(Enum):
     DEALER = ''
     UNKNOWN = 'unknown'
 
+
+class PlayerStatusReason(Enum):
+    # win
+    DEALER_BUST = 'dealer_bust'
+    HAND_VALUE = 'hand_value'
+    BLACKJACK = 'blackjack'
+    FIVECARD = 'five_card'
+
+    # lose
+    BUST = 'bust'
+    DEALER_HAND_VALUE = 'dealer_hand_value'
+    DEALER_BLACKJACK = 'dealer_blackjack'
+    DEALER_FIVECARD = 'dealer_five_card'
+
+    # unknown
+    UNKNOWN = 'unknown'
+
+
 class Player():
     def __init__(self, name: str, is_npc: bool = True):
         self.name = name
         self.hand = Hand()
         self.status = PlayerStatus.GAME
+        self.status_reason = None
         self.request_card_probi = RequestCardProbability()
         self.is_npc = is_npc
 
     def init(self):
         self.hand.init()
         self.status = PlayerStatus.GAME 
+        self.status_reason = None
 
     def add_card(self, card: Card) -> None:
         if self.status in (PlayerStatus.WIN, PlayerStatus.LOSE):

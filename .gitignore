@@ -6,3 +6,6 @@ __pycache__/
 
 # ignore logs
 logs/
+
+# ignore playground used for code testing
+playground.py
