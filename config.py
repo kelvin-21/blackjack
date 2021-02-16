@@ -21,7 +21,7 @@ def config_logger():
     fh.setFormatter(formatter)
 
     sh = logging.StreamHandler(sys.stdout)
-    sh.setLevel(logging.INFO)
+    sh.setLevel(logging.DEBUG)
     sh.setFormatter(formatter)
 
     root.addHandler(fh)
