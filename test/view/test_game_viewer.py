@@ -8,12 +8,11 @@ class TestGameViewer(unittest.TestCase):
         self.game_viewer = GameViewer()
         self.card_A = Card(Suit.SPADE, Rank.A)
         self.card_10 = Card(Suit.SPADE, Rank.TEN)
-        self.hand_1, self.hand_2, self.hand_3 = Hand(), Hand(), Hand()
+        self.hand_1, self.hand_2, self.hand_3, self.hand_4 = Hand(), Hand(), Hand(), Hand()
         self.hand_1.add_card(self.card_A)
-        self.hand_2.add_card(self.card_10)
-        self.hand_2.add_card(self.card_A)
-        self.hand_3.add_card(self.card_10)
-        self.hand_3.add_card(self.card_10)
+        self.hand_2.add_card(self.card_10), self.hand_2.add_card(self.card_A)
+        self.hand_3.add_card(self.card_10), self.hand_3.add_card(self.card_10)
+        self.hand_4.add_card(self.card_10), self.hand_4.add_card(self.card_10), self.hand_4.add_card(self.card_A)
         self.dealer = Dealer(16)
         self.dealer.hand = self.hand_3
         self.players = [Player('test_1'), Player('testing_2')]
@@ -30,19 +29,60 @@ class TestGameViewer(unittest.TestCase):
         self.view_card_helper(Card(Suit.SPADE, Rank.J), '♠ J')
         self.view_card_helper(Card(Suit.SPADE, Rank.Q), '♠ Q')
         self.view_card_helper(Card(Suit.SPADE, Rank.K), '♠ K')
+
+    def test_card_not_visible(self):
+        result = self.game_viewer.card(self.card_10, False)
+        expected = ' - '
+        self.assertEqual(result, expected)
     
     def test_hand(self):
         self.view_hand_helper(self.hand_1, '(♠ A)')
         self.view_hand_helper(self.hand_2, '(♠ 10) (♠ A)')
 
+    def test_hand_not_visible(self):
+        self.view_hand_helper_not_visibile(self.hand_1, '(♠ A)')
+        self.view_hand_helper_not_visibile(self.hand_2, '(♠ 10) ( - )')
+        self.view_hand_helper_not_visibile(self.hand_3, '(♠ 10) ( - )')
+        self.view_hand_helper_not_visibile(self.hand_4, '(♠ 10) ( - ) (♠ A)')
+
     def test_all_hands(self):
         result = self.game_viewer.all_hands(self.dealer, self.players)
-        expected = '[Dealer   ]: (♠ 10) (♠ 10)\n[test_1   ]: (♠ A)\n[testing_2]: (♠ 10) (♠ A)\n'
+        expected = ''
+        expected += '[Dealer   ]: (♠ 10) (♠ 10)\n'
+        expected += '[test_1   ]: (♠ A)\n'
+        expected += '[testing_2]: (♠ 10) (♠ A)\n'
+        self.assertEqual(result, expected)
+
+    def test_all_hands_with_limited_visibility(self):
+        result = self.game_viewer.all_hands(self.dealer, self.players, self.players[0])
+        expected = ''
+        expected += '[Dealer   ]: (♠ 10) ( - )\n'
+        expected += '[test_1   ]: (♠ A)\n'
+        expected += '[testing_2]: (♠ 10) ( - )\n'
         self.assertEqual(result, expected)
 
     def test_players_details(self):
         result = self.game_viewer.players_details(self.dealer, self.players)
-        expected = '[Dealer   ]:      - (♠ 10) (♠ 10)\n[test_1   ]: game - (♠ A)\n[testing_2]: game - (♠ 10) (♠ A)\n'
+        expected = ''
+        expected += '[Dealer   ]:      - (♠ 10) (♠ 10)\n'
+        expected += '[test_1   ]: game - (♠ A)\n'
+        expected += '[testing_2]: game - (♠ 10) (♠ A)\n'
+        self.assertEqual(result, expected)
+
+    def test_player_info(self):
+        result = self.game_viewer.players_info(self.dealer, self.players)
+        expected = ''
+        expected += '[Dealer   ]:      -      - (♠ 10) (♠ 10)\n'
+        expected += '[test_1   ]: game - game - (♠ A)\n'
+        expected += '[testing_2]: game - game - (♠ 10) (♠ A)\n'
+        self.assertEqual(result, expected)
+
+    def test_player_info_with_limited_visibility(self):
+        result = self.game_viewer.players_info(self.dealer, self.players, self.players[0])
+        expected = ''
+        expected += '[Dealer   ]:      -      - (♠ 10) ( - )\n'
+        expected += '[test_1   ]: game - game - (♠ A)\n'
+        expected += '[testing_2]: game - game - (♠ 10) ( - )\n'
         self.assertEqual(result, expected)
 
     def test_all_cards(self):
@@ -62,13 +102,23 @@ class TestGameViewer(unittest.TestCase):
         result = self.game_viewer.hand(hand)
         self.assertEqual(result, expected)
 
+    # helper function
+    def view_hand_helper_not_visibile(self, hand: Hand, expected: str):
+        result = self.game_viewer.hand(hand, False)
+        self.assertEqual(result, expected)
+
     @staticmethod
     def run_all_test():
         suite = unittest.TestSuite()
         suite.addTest(TestGameViewer('test_card'))
+        suite.addTest(TestGameViewer('test_card_not_visible'))
         suite.addTest(TestGameViewer('test_hand'))
+        suite.addTest(TestGameViewer('test_hand_not_visible'))
         suite.addTest(TestGameViewer('test_all_hands'))
+        suite.addTest(TestGameViewer('test_all_hands_with_limited_visibility'))
         suite.addTest(TestGameViewer('test_players_details'))
+        suite.addTest(TestGameViewer('test_player_info'))
+        suite.addTest(TestGameViewer('test_player_info_with_limited_visibility'))
         suite.addTest(TestGameViewer('test_all_cards'))
 
         runner = unittest.TextTestRunner()
