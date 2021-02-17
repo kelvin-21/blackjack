@@ -12,6 +12,8 @@ from test.controller.handler.test_card_request_handler import TestCardRequestHan
 
 from test.view.test_game_viewer import TestGameViewer
 
+from test.utilities.test_utilities import TestUtilities
+
 
 def run_all_test():
 
@@ -28,6 +30,8 @@ def run_all_test():
     TestCardRequestHandler.run_all_test()
         
     TestGameViewer.run_all_test()
+
+    TestUtilities.run_all_test()
     
     print('----------------------------------------------------------------------')
     print('[ALL] Finished\n\n')
