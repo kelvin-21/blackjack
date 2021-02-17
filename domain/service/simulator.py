@@ -18,17 +18,18 @@ class Simulator():
         self.simulation_trials = self.config_loader.simulation_trials
 
     def run_simulation(self, game_input: Game, player_input: Player) -> dict:
-        (game, player) = self.make_copy(game_input, player_input)
-
-        if not self.is_valid_for_simulation(game, player):
+        if not self.is_valid_for_simulation(game_input, player_input):
             return
+
+        (game, player) = self.make_copy(game_input, player_input)
+        original_cards = len(player_input.hand.hand)
 
         sim_result = self.init_sim_result()
         for decision in Decision:
             for _ in range(self.simulation_trials):
 
                 try:
-                    self.prepare_game_for_simulation(game, player)
+                    self.prepare_game_for_simulation(game, player, original_cards)
                     result = self.simulate(game, player, decision)
                     self.update_simulation_result(sim_result, decision, result)
                     
@@ -40,32 +41,19 @@ class Simulator():
 
     # reuse the game instance
     @staticmethod
-    def prepare_game_for_simulation(game: Game, player: Player) -> None:
+    def prepare_game_for_simulation(game: Game, player: Player, original_cards: int) -> None:
         while len(game.dealer.hand.hand) > 1:
             card = game.dealer.hand.hand.pop()
             game.card_deck.deck.append(card)
-        card = game.dealer.hand.hand.pop()
-        game.dealer.init()
-        game.dealer.add_card(card)
+        game.dealer.update_hand_value()
 
         for player_i in game.players:
-            if player_i == player:
-                while len(player_i.hand.hand) > 2:
-                    card = player_i.hand.hand.pop()
-                    game.card_deck.deck.append(card)
-                card_2 = player_i.hand.hand.pop()
-                card_1 = player_i.hand.hand.pop()
-                player_i.init()
-                player_i.add_card(card_1)
-                player_i.add_card(card_2)
-
-            if player_i != player:
-                while len(player_i.hand.hand) > 1:
-                    card = player_i.hand.hand.pop()
-                    game.card_deck.deck.append(card)
+            remain = original_cards if player_i == player else 1
+            while len(player_i.hand.hand) > remain:
                 card = player_i.hand.hand.pop()
-                player_i.init()
-                player_i.add_card(card)
+                game.card_deck.deck.append(card)
+            player_i.update_hand_value()
+            player_i.status, player_i.status_reason = PlayerStatus.GAME, PlayerStatusReason.GAME
 
     def simulate(self, game: Game, player: Player, decision: Decision) -> Tuple[PlayerStatus, PlayerStatusReason]:
         self.simulate_distribute_first_two_cards(game)

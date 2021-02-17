@@ -5,6 +5,7 @@ from configuration import ConfigLoader
 
 class TestSimulator(unittest.TestCase):
     def setUp(self):
+        self.card_A = Card(Suit.SPADE, Rank.A)
         self.card_10 = Card(Suit.SPADE, Rank.TEN)
         self.player_me = Player('me', is_npc=False)
         self.player_npc = Player('npc')
@@ -90,13 +91,19 @@ class TestSimulator(unittest.TestCase):
         dealer = self.game.dealer
         players = self.game.players
         initial_total_cards = len(self.game.card_deck.deck) + len(dealer.hand.hand) + sum([len(player.hand.hand) for player in players])
-        self.simulator.prepare_game_for_simulation(self.game, self.player_me)
+        self.simulator.prepare_game_for_simulation(self.game, self.player_me, 2)
 
         total_cards = len(self.game.card_deck.deck) + len(dealer.hand.hand) + sum([len(player.hand.hand) for player in players])
         self.assertEqual(len(dealer.hand.hand), 1)
         self.assertEqual(len(self.player_me.hand.hand), 2)
         self.assertEqual(len(self.player_npc.hand.hand), 1)
         self.assertEqual(initial_total_cards, total_cards)
+
+    def given_3_card_in_hand_and_prepare_game_for_simulation_then_still_3_card(self):
+        self.player_me.add_card(self.card_A)
+        self.simulator.prepare_game_for_simulation(self.game, self.player_me, 3)
+
+        self.assertEqual(len(self.player_me.hand.hand), 3)
 
     def test_update_simulation_result(self):
         sim_result = self.simulator.init_sim_result()
@@ -132,7 +139,7 @@ class TestSimulator(unittest.TestCase):
         self.assertEqual(status_reason.__class__, PlayerStatusReason)
 
     def integration_test_run_simulation(self):
-        self.simulator.simulation_trials = 50
+        self.simulator.simulation_trials = 1000
         sim_result = self.simulator.run_simulation(self.game, self.player_me)
         total_count = 0
         for i in sim_result.keys():
@@ -166,6 +173,7 @@ class TestSimulator(unittest.TestCase):
         suite.addTest(TestSimulator('set_up_is_valid_for_simulation'))
         suite.addTest(TestSimulator('test_make_copy'))
         suite.addTest(TestSimulator('test_prepare_game_for_simulation'))
+        suite.addTest(TestSimulator('given_3_card_in_hand_and_prepare_game_for_simulation_then_still_3_card'))
         suite.addTest(TestSimulator('test_update_simulation_result'))
         suite.addTest(TestSimulator('test_simulate_distribute_first_two_cards'))
         suite.addTest(TestSimulator('test_simulate_card_request_posite_target_correctly'))
