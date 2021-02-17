@@ -1,6 +1,6 @@
 import unittest
 from domain.model import Game, Card, Hand, Suit, Rank, PlayerStatus, PlayerStatusReason, HandStatus
-from domain.service import ConfigLoader
+from configuration import ConfigLoader
 from typing import List
 
 
