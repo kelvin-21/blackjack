@@ -126,6 +126,16 @@ class TestSimulationViewer(unittest.TestCase):
 
         self.assertEqual(result, expected)
 
+    def test_advice(self):
+        expected = ''
+        expected += f'P({PlayerStatus.WIN.value}|{Decision.REQUEST.value}) = 0.700\n'
+        expected += f'P({PlayerStatus.WIN.value}|{Decision.PASS.value}) = 0.650\n'
+        expected += f'Advice: {Decision.REQUEST.value} -> 70.0% {PlayerStatus.WIN.value}\n'
+
+        result = self.simulation_viewer.advice(self.sim_result)
+
+        self.assertEqual(result, expected)
+
     @staticmethod
     def run_all_test():
         suite = unittest.TestSuite()
@@ -133,6 +143,7 @@ class TestSimulationViewer(unittest.TestCase):
         suite.addTest(TestSimulationViewer('test_sim_result_detail_num'))
         suite.addTest(TestSimulationViewer('test_sim_result_short_percentage'))
         suite.addTest(TestSimulationViewer('test_sim_result_detail_percentage'))
+        suite.addTest(TestSimulationViewer('test_advice'))
 
         runner = unittest.TextTestRunner()
         runner.run(suite)

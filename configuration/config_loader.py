@@ -7,7 +7,7 @@ Config = {
     'num_card_set'              : 2,
     'dealer_min'                : 16,
     'max_num_card_in_hand'      : 5,
-    'simulation_trials'         : 100
+    'simulation_trials'         : 1000
 }
 
 
