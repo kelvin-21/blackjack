@@ -63,6 +63,9 @@ class Hand():
     def update_status(self) -> None:
         if len(self.hand_value) == 0:
             self.status = HandStatus.BUST
+
+        elif len(self.hand_value) == 1 and self.hand_value[0] > 21:
+            self.status = HandStatus.BUST
         
         elif len(self.hand) == 2 and max(self.hand_value) == 21:
             self.status = HandStatus.BLACKJACK
@@ -72,3 +75,11 @@ class Hand():
 
         else:
             self.status = HandStatus.LIVE
+
+    def calculate_update_hand_value(self) -> None:
+        temp = []
+        while self.hand:
+            temp.append(self.hand.pop())
+        self.init()
+        while temp:
+            self.add_card(temp.pop())

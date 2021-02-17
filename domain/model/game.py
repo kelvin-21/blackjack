@@ -55,6 +55,9 @@ class Game():
             self.players.append(Player(f'Player_{i+2}'))
     
     def distribute_card(self, target: Player, suit: Suit = None, rank: Rank = None) -> bool:
+        if not target.can_request_card() or self.card_deck.is_empty():
+            return False
+            
         if suit is not None or rank is not None:
             # distribute a certain card
             card = self.card_deck.search_card(suit, rank)
@@ -66,7 +69,7 @@ class Game():
             return self.send_card(target, card)
 
     def send_card(self, target: Player, card: Card) -> bool:
-        if card:
+        if card and target.can_request_card() and not self.card_deck.is_empty():
             target.add_card(card)
             self.card_deck.remove_card(card)
             return True

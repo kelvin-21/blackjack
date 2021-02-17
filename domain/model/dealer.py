@@ -1,4 +1,4 @@
-from domain.model import Player, PlayerStatus, Hand
+from domain.model import Player, PlayerStatus, PlayerStatusReason, Hand
 
 
 class Dealer(Player):
@@ -6,9 +6,11 @@ class Dealer(Player):
         super(Dealer, self).__init__('Dealer')
         self.dealer_min = dealer_min  # minimum hand value to attain in each round
         self.status = PlayerStatus.DEALER
+        self.status_reason = PlayerStatusReason.DEALER
 
     def init(self):
         self.hand.init()
+        self.status_reason = PlayerStatusReason.DEALER
     
     def is_request_card(self) -> bool:
         if not self.can_request_card():
@@ -18,3 +20,4 @@ class Dealer(Player):
 
     def update_status(self):
         self.status = PlayerStatus.DEALER
+        self.status_reason = PlayerStatusReason.DEALER

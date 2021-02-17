@@ -14,6 +14,10 @@ class PlayerStatus(Enum):
 
 
 class PlayerStatusReason(Enum):
+    # game
+    GAME = 'game'
+    DEALER = ''
+
     # win
     DEALER_BUST = 'dealer_bust'
     HAND_VALUE = 'hand_value'
@@ -35,14 +39,14 @@ class Player():
         self.name = name
         self.hand = Hand()
         self.status = PlayerStatus.GAME
-        self.status_reason = None
+        self.status_reason = PlayerStatusReason.GAME
         self.request_card_probi = RequestCardProbability()
         self.is_npc = is_npc
 
     def init(self):
         self.hand.init()
         self.status = PlayerStatus.GAME 
-        self.status_reason = None
+        self.status_reason = PlayerStatusReason.GAME
 
     def add_card(self, card: Card) -> None:
         if self.status in (PlayerStatus.WIN, PlayerStatus.LOSE):
@@ -52,7 +56,7 @@ class Player():
         self.update_status()
 
     def can_request_card(self) -> bool:
-        return self.hand.status == HandStatus.LIVE
+        return self.status in (PlayerStatus.GAME, PlayerStatus.DEALER) and self.hand.status == HandStatus.LIVE
 
     def is_request_card(self) -> bool:
         if not self.can_request_card():
@@ -71,6 +75,9 @@ class Player():
     def update_status(self) -> None:
         if self.hand.status == HandStatus.BUST:
             self.status = PlayerStatus.LOSE
+
+    def update_hand_value(self) -> None:
+        self.hand.calculate_update_hand_value()
 
     @staticmethod
     def probi_toss_coin(p: float) -> bool:

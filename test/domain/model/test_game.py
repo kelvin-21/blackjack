@@ -87,6 +87,25 @@ class TestGame(unittest.TestCase):
         self.assertEqual(self.game.dealer.hand.hand[0], card)
         self.assertEqual(len(self.game.card_deck.deck), self.num_card - 1)
 
+    def given_card_deck_empty_then_cannot_distribute_card(self):
+        self.game.card_deck.deck = list()
+        flag = self.game.distribute_card(self.game.players[0])
+
+        self.assertFalse(flag)
+
+    def given_player_win_then_cannot_distribute_card(self):
+        player = self.game.players[0]
+        player.status = PlayerStatus.WIN
+        flag = self.game.distribute_card(player)
+
+        self.assertFalse(flag)
+
+    def given_player_lose_then_cannot_distribute_card(self):
+        player = self.game.players[0]
+        player.status = PlayerStatus.LOSE
+        flag = self.game.distribute_card(player)
+
+        self.assertFalse(flag)
 
     def distribute_card_that_exist_with_specified_suit_and_rank(self):
         player = self.game.players[0]
@@ -231,6 +250,9 @@ class TestGame(unittest.TestCase):
         suite.addTest(TestGame('send_card_to_dealer'))
         suite.addTest(TestGame('distribute_card_that_exist_with_specified_suit_and_rank'))
         suite.addTest(TestGame('distribute_card_to_dealer'))
+        suite.addTest(TestGame('given_card_deck_empty_then_cannot_distribute_card'))
+        suite.addTest(TestGame('given_player_win_then_cannot_distribute_card'))
+        suite.addTest(TestGame('given_player_lose_then_cannot_distribute_card'))
         suite.addTest(TestGame('distribute_card_that_exist_with_specified_suit'))
         suite.addTest(TestGame('distribute_card_that_exist_with_specified_rank'))
         suite.addTest(TestGame('distribute_card_that_not_exist_then_return_false'))

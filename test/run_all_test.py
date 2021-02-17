@@ -11,6 +11,7 @@ from test.controller.handler.test_card_input_handler import TestCardInputHandler
 from test.controller.handler.test_card_request_handler import TestCardRequestHandler
 
 from test.view.test_game_viewer import TestGameViewer
+from test.view.test_simulation_viewer import TestSimulationViewer
 
 from test.utilities.test_utilities import TestUtilities
 
@@ -30,6 +31,7 @@ def run_all_test():
     TestCardRequestHandler.run_all_test()
         
     TestGameViewer.run_all_test()
+    TestSimulationViewer.run_all_test()
 
     TestUtilities.run_all_test()
     

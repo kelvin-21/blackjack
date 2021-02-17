@@ -138,6 +138,21 @@ class TestHand(unittest.TestCase):
         self.assertEqual(self.hand.hand_value, [])
         self.assertEqual(self.hand.status, HandStatus.BUST)
 
+    # ----- hand value -----
+
+    def test_calculate_update_hand_value(self):
+        self.hand.add_card(self.card_8)
+        self.hand.add_card(self.card_9)
+        self.hand.add_card(self.card_A)
+        original = self.hand.hand_value
+        self.hand.hand_value = [-1]
+        self.hand.calculate_update_hand_value()
+
+        self.assertEqual(self.hand.hand_value, original)
+        self.assertEqual(self.hand.hand[0], self.card_8)
+        self.assertEqual(self.hand.hand[1], self.card_9)
+        self.assertEqual(self.hand.hand[2], self.card_A)
+
     @staticmethod
     def run_all_test():
         suite = unittest.TestSuite()
@@ -155,6 +170,7 @@ class TestHand(unittest.TestCase):
         suite.addTest(TestHand('given_two_A_as_11_bust_then_use_it_as_1_only'))
         suite.addTest(TestHand('given_five_cards_and_not_bust_then_status_is_fivecard'))
         suite.addTest(TestHand('given_five_cards_and_bust_then_status_is_bust'))
+        suite.addTest(TestHand('test_calculate_update_hand_value'))
 
         runner = unittest.TextTestRunner()
         runner.run(suite)
