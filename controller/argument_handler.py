@@ -1,7 +1,7 @@
 from domain.model import Game
 from domain.service import Simulator
 from controller import GameStatus
-from controller.handler import CardInputHandler, CardInputResult, CardRequestHandler, CardRequestResult
+from controller.handler import CardInputHandler, CardInputResult, CardRequestHandler, CardRequestResult, CommandHandler
 from view import GameViewer, SimulationViewer
 from enum import Enum
 import logging
@@ -20,7 +20,6 @@ class ArgumentHandler():
             sim_viewer: SimulationViewer
         ):
         self.game = game
-        self.player_me = None
         self.bypass = None
         self.is_task = None
         self.sim_result = None
@@ -31,6 +30,7 @@ class ArgumentHandler():
         self.sim_viewer = sim_viewer
         self.card_input_handler = CardInputHandler()
         self.card_request_handler = CardRequestHandler()
+        self.command_handler = CommandHandler(self.simulator, self.game_viewer, self.sim_viewer)
         
         # mapper
         self.task_result_mapper = {
@@ -44,17 +44,13 @@ class ArgumentHandler():
 
     # return generic result
     def handle(self, arg_task: ArgumentTask = None, msg: str ='Please input:'):
-        if not self.player_me:
-            for player in self.game.players:
-                if player.name == 'Me':
-                    self.player_me = player
-                    break
-
         self.bypass = False
-        self.sim_result = None
+        self.command_handler.sim_result_clear_cache()
+
         if not arg_task:  # handle non-task
             self.is_task = False
-            self.handle_non_task(msg)           
+            self.handle_non_task(msg)
+            
         else:  # handle task
             self.is_task = True
             return self.handle_task(arg_task, msg)
@@ -95,68 +91,7 @@ class ArgumentHandler():
                 return False
 
     def command(self, arg: str) -> None:
-        if arg == '/go':  # force go
-            self.bypass = True
-            
-        elif arg == '' and not self.is_task:  # force go if not a task
-            self.bypass = True
-
-        elif arg == '/re':  # restart round
-            self.game.status = GameStatus.RESTART_ROUND
-            self.bypass = True
-
-        elif arg == '/RE':  # restart game
-            self.game.status = GameStatus.START_NEW_GAME
-            self.bypass = True
-
-        elif arg[:6] == '/hands':  # view all hands
-            limited_visible = None if '-f' in arg else self.player_me
-            msg = self.game_viewer.all_hands(self.game.dealer, self.game.players, limited_visible)
-            self.game_viewer.view(msg)
-
-        elif arg[:5] == '/info': # view name, status, status_reason
-            limited_visible = None if '-f' in arg else self.player_me
-            msg = self.game_viewer.players_info(self.game.dealer, self.game.players, limited_visible)
-            self.game_viewer.view(msg)
-
-        elif arg == '/cards':  # view all cards and stat
-            msg = self.game_viewer.all_cards(self.game.card_deck)
-            self.game_viewer.view(msg)
-
-        elif arg[:4] == '/sim':  # run simulation
-            if not self.sim_result or '-r' in arg:
-                for player_i in self.game.players:
-                    if player_i.name == 'Me':
-                        player = player_i
-                        break
-                self.sim_result = self.simulator.run_simulation(self.game, player)
-
-            if not self.sim_result:
-                logging.info('Not valid yet for simulation')
-                return
-
-            content = 'detail' if '-l' in arg else 'short'
-            display = 'num' if '-n' in arg else 'percentage'
-            msg = self.sim_viewer.sim_result(self.sim_result, content, display)
-            self.sim_viewer.view(msg)
-            
-        elif arg == '/ad':  # seek advice on whether to request an extra card
-            if not self.sim_result or '-r' in arg:
-                for player_i in self.game.players:
-                    if player_i.name == 'Me':
-                        player = player_i
-                        break
-                self.sim_result = self.simulator.run_simulation(self.game, player)
-
-            if not self.sim_result:
-                logging.info('Not valid yet for simulation')
-                return
-
-            msg = self.sim_viewer.advice(self.sim_result)
-            self.sim_viewer.view(msg)
-
-        else:
-            logging.warning(f'Unknown command arg - [{arg}]')
+        self.bypass = self.command_handler.handle(arg, self.is_task, self.game)
 
     def task(self, arg: str, arg_task: ArgumentTask):
         return self.task_handler_mapper[arg_task].handle(arg)
