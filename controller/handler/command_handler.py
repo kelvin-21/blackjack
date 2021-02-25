@@ -23,8 +23,6 @@ class CommandHandler():
 
     def handle(self, arg: str, is_task: bool, game: Game) -> bool: # return bool: bypass
 
-        self.find_player_me(game.players)
-
         if arg == '/go':  # force go
             return True
             
@@ -39,7 +37,7 @@ class CommandHandler():
             game.status = GameStatus.START_NEW_GAME
             return True
 
-        elif any(item in arg for item in ['/hands', '/info', 'cards']):
+        elif any(item in arg for item in ['/hands', '/info', '/cards']):
             msg = self.handle_msg(arg, game)
             self.game_viewer.view(msg)
             return False
@@ -55,6 +53,8 @@ class CommandHandler():
         return False
 
     def handle_msg(self, arg: str, game: Game) -> str:
+        
+        self.find_player_me(game.players)
         msg = None
 
         if arg[:6] == '/hands':  # view all hands
@@ -77,7 +77,7 @@ class CommandHandler():
                 display = 'num' if '-n' in arg else 'percentage'
                 msg = self.sim_viewer.sim_result(self.sim_result, content, display)
             else:
-                logging.info('Not valid yet for simulation')
+                logging.info('Not valid for simulation')
             
         elif arg == '/ad':  # seek advice on whether to request an extra card
             if not self.sim_result or '-r' in arg:
@@ -86,7 +86,7 @@ class CommandHandler():
             if self.sim_result:
                 msg = self.sim_viewer.advice(self.sim_result)
             else:
-                logging.info('Not valid yet for simulation')
+                logging.info('Not valid for simulation')
 
         return msg
 

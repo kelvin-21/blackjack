@@ -9,6 +9,7 @@ from test.domain.service.test_simulator import TestSimulator
 
 from test.controller.handler.test_card_input_handler import TestCardInputHandler
 from test.controller.handler.test_card_request_handler import TestCardRequestHandler
+from test.controller.handler.test_command_handler import TestCommandHandler
 
 from test.view.test_game_viewer import TestGameViewer
 from test.view.test_simulation_viewer import TestSimulationViewer
@@ -29,6 +30,7 @@ def run_all_test():
 
     TestCardInputHandler.run_all_test()
     TestCardRequestHandler.run_all_test()
+    TestCommandHandler.run_all_test()
         
     TestGameViewer.run_all_test()
     TestSimulationViewer.run_all_test()
