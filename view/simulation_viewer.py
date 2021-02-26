@@ -1,5 +1,5 @@
 from domain.model import PlayerStatus
-from domain.service import Decision
+from domain.service import Simulator, Decision
 from utilities import Utilities
 
 
@@ -61,7 +61,17 @@ class SimulationViewer():
 
     @staticmethod
     def advice(sim_result: dict) -> str:
+        decision = Simulator.get_advice(sim_result)
+
         sum_dict = Utilities.sum_nested_dict
+        if decision:
+            maximum = sum_dict(sim_result[decision][PlayerStatus.WIN]) / sum_dict(sim_result[decision])
+            advice_msg = decision.value
+
+        else:  # decision is None
+            maximum = sum_dict(sim_result[Decision.REQUEST][PlayerStatus.WIN]) / sum_dict(sim_result[Decision.REQUEST])
+            advice_msg = 'try your luck'
+
         request_c = sum_dict(sim_result[Decision.REQUEST])
         pass_c = sum_dict(sim_result[Decision.PASS])
         win_given_request_c = sum_dict(sim_result[Decision.REQUEST][PlayerStatus.WIN])
@@ -69,20 +79,10 @@ class SimulationViewer():
 
         win_given_request_p = win_given_request_c / request_c
         win_given_pass_p = win_given_pass_c / pass_c
-
-        if win_given_request_p > win_given_pass_p:
-            advice = Decision.REQUEST.value
-            maximum = win_given_request_p
-        elif win_given_request_p < win_given_pass_p:
-            advice = Decision.PASS.value
-            maximum = win_given_pass_c
-        else:  # equality
-            advice = 'Try your luck'
-            maximum = win_given_request_p
         
         msg = ''
         msg += f'P({PlayerStatus.WIN.value}|{Decision.REQUEST.value}) = {win_given_request_p:.3f}\n'
         msg += f'P({PlayerStatus.WIN.value}|{Decision.PASS.value}) = {win_given_pass_p:.3f}\n'
-        msg += f'Advice: {advice} -> {maximum:.1%} {PlayerStatus.WIN.value}\n'
+        msg += f'Advice: {advice_msg} -> {maximum:.1%} {PlayerStatus.WIN.value}\n'
 
         return msg

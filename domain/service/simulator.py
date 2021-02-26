@@ -1,5 +1,6 @@
 from domain.model import Game, Player, PlayerStatus, PlayerStatusReason, HandStatus
 from configuration import ConfigLoader
+from utilities import Utilities
 from enum import Enum
 from typing import Tuple
 import copy
@@ -38,6 +39,19 @@ class Simulator():
                     traceback.print_exc()
 
         return sim_result
+
+    @staticmethod
+    def get_advice(sim_result) -> Decision:
+        sum_dict = Utilities.sum_nested_dict
+        win_given_request_c = sum_dict(sim_result[Decision.REQUEST][PlayerStatus.WIN])
+        win_given_pass_c = sum_dict(sim_result[Decision.PASS][PlayerStatus.WIN])
+
+        if win_given_request_c > win_given_pass_c:
+            return Decision.REQUEST
+        elif win_given_request_c < win_given_pass_c:
+            return Decision.PASS
+        else:  # equality
+            return
 
     # reuse the game instance
     @staticmethod
