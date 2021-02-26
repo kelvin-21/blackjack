@@ -22,7 +22,7 @@ class Game():
         self.create_players(num_player)
         self.dealer = Dealer(dealer_min)
         self.card_deck = CardDeck(num_card_set)
-        self.cards_required_each_round = (num_player + 1) * 3
+        self.cards_required_each_round = (num_player + 1) * 4
 
         self.init_game()
 

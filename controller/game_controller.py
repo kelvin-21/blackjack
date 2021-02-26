@@ -1,5 +1,5 @@
 from domain.model import Game, Player, Card, Suit, Rank
-from domain.service import Simulator
+from domain.service import Simulator, Decision, GameRecorder
 from controller import ArgumentHandler, ArgumentTask, GameStatus
 from view import GameViewer, SimulationViewer
 from configuration import ConfigLoader
@@ -13,13 +13,20 @@ class GameController():
             config_loader: ConfigLoader, 
             simulator: Simulator, 
             game_viewer: GameViewer,
-            sim_viewer: SimulationViewer
+            sim_viewer: SimulationViewer,
+            game_recorder: GameRecorder
         ):
         self.game = Game(config_loader)
+        self.simulator = simulator
         self.argument_handler = ArgumentHandler(self.game, simulator, game_viewer, sim_viewer)
         self.game_viewer = game_viewer
+        self.sim_viewer = sim_viewer
+        self.game_recorder = game_recorder
+
+        # control param
         self.control = True
         self.pause = True
+        self.use_advice = True
 
     def init(self):
         self.game.init()
@@ -47,6 +54,7 @@ class GameController():
         elif self.game.status == GameStatus.FINISHED:
             msg = self.game_viewer.players_info(self.game.dealer, self.game.players)
             self.game_viewer.view(msg)
+            self.game_recorder.record(self.game)
             self.game.status = GameStatus.START_NEW_ROUND
             if self.pause:
                 pause_msg = 'Press any key to continue...'
@@ -127,11 +135,23 @@ class GameController():
                 if self.game.status != GameStatus.GAME or not target.can_request_card():
                     return
 
-                request_card = target.is_request_card()
                 if self.control:
                     msg = f'Input whether {target.name} would like 1 more card:'
                     result = self.argument_handler.handle(ArgumentTask.CARD_REQUEST, msg)
                     request_card = result.request_card
+                else:
+                    if self.use_advice:
+                        sim_result = self.simulator.run_simulation(self.game, target)
+                        advice = self.simulator.get_advice(sim_result)
+                        if advice:
+                            request_card = True if advice == Decision.REQUEST else False
+                            logging.debug(f'\n{self.sim_viewer.sim_result_short(sim_result)}\n{advice.value}\n')
+                        else:  # equality between request and pass
+                            request_card = False
+                            logging.debug('Choose default - not request card')
+
+                    else:
+                        request_card = target.is_request_card()
 
                 if request_card:
                     self.controller_distribute_card(target)

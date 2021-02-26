@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 
 class Utilities():
@@ -31,3 +32,7 @@ class Utilities():
         if isinstance(d, dict):
             return 1 + (max(map(Utilities.depth, d.values())) if d else 0)
         return 0
+
+    @staticmethod
+    def datetime_str() -> str:
+        return datetime.now().strftime('%Y-%m-%d %H:%M:%S')

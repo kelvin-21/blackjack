@@ -9,3 +9,6 @@ logs/
 
 # ignore playground used for code testing
 playground.py
+
+# ignore data file
+data.csv
