@@ -1,5 +1,6 @@
 import logging
 import sys
+import os
 
 
 Config = {
@@ -30,6 +31,10 @@ class ConfigLoader():
 
     @staticmethod
     def config_logger():
+        # create log if not exist
+        log_filename = "logs/blackjack.log"
+        os.makedirs(os.path.dirname(log_filename), exist_ok=True)
+
         formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
 
         root = logging.getLogger()

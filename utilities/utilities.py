@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class Utilities():
@@ -35,7 +35,8 @@ class Utilities():
 
     @staticmethod
     def datetime_str() -> str:
-        return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        # return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        return (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
 
     @staticmethod
     def order_str(order: int) -> str:
@@ -46,3 +47,7 @@ class Utilities():
             4: '4th',
             5: '5th'
         }[order]
+
+
+s = Utilities.datetime_str()
+print(s)
