@@ -2,6 +2,7 @@ from domain.model import Game, Player, Card, Suit, Rank
 from domain.service import Simulator, Decision, GameRecorder
 from controller import ArgumentHandler, ArgumentTask, GameStatus
 from view import GameViewer, SimulationViewer
+from utilities import Utilities
 from configuration import ConfigLoader
 import logging
 import traceback
@@ -17,6 +18,7 @@ class GameController():
             game_recorder: GameRecorder
         ):
         self.game = Game(config_loader)
+
         self.simulator = simulator
         self.argument_handler = ArgumentHandler(self.game, simulator, game_viewer, sim_viewer)
         self.game_viewer = game_viewer
@@ -117,7 +119,7 @@ class GameController():
         
         suit, rank = None, None
         if self.control:
-            msg = f'Input the {self.order_str(len(target.hand.hand)+1)} card of {target.name}:'
+            msg = f'Input the {Utilities.order_str(len(target.hand.hand)+1)} card of {target.name}:'
             result = self.argument_handler.handle(ArgumentTask.CARD_INPUT, msg)
             suit, rank = result.suit, result.rank
         
@@ -142,7 +144,7 @@ class GameController():
                 else:
                     if self.use_advice:
                         sim_result = self.simulator.run_simulation(self.game, target)
-                        advice = self.simulator.get_advice(sim_result)
+                        advice = self.simulator.get_advice(self.game, self.game.get_player_me(), sim_result)
                         if advice:
                             request_card = True if advice == Decision.REQUEST else False
                             logging.debug(f'\n{self.sim_viewer.sim_result_short(sim_result)}\n{advice.value}\n')
@@ -157,13 +159,3 @@ class GameController():
                     self.controller_distribute_card(target)
                 else:
                     return
-
-    @staticmethod
-    def order_str(order: int) -> str:
-        return {
-            1: '1st',
-            2: '2nd',
-            3: '3rd',
-            4: '4th',
-            5: '5th'
-        }[order]

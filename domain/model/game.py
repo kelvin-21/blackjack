@@ -123,3 +123,9 @@ class Game():
 
         else:
             raise ValueError(f'Unknown HandStatus ({self.dealer.hand.status}) for dealer')
+
+    def get_player_me(self) -> Player:
+        for player_i in self.players:
+            if player_i.name == 'Me':
+                return player_i
+        raise ValueError('Player Me not found in the game players')

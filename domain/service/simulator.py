@@ -40,8 +40,14 @@ class Simulator():
 
         return sim_result
 
-    @staticmethod
-    def get_advice(sim_result) -> Decision:
+    def get_advice(self, game: Game, player: Player, sim_result: dict = None) -> Decision:
+        # if hand value <= 11, then request extra card
+        if len(player.hand.hand_value) == 1 and player.hand.hand_value[0] <= 11:
+            return Decision.REQUEST
+
+        # advise base on simulation result
+        if not sim_result:
+            sim_result = self.run_simulation(game, player)
         sum_dict = Utilities.sum_nested_dict
         win_given_request_c = sum_dict(sim_result[Decision.REQUEST][PlayerStatus.WIN])
         win_given_pass_c = sum_dict(sim_result[Decision.PASS][PlayerStatus.WIN])

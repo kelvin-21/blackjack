@@ -36,3 +36,13 @@ class Utilities():
     @staticmethod
     def datetime_str() -> str:
         return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    @staticmethod
+    def order_str(order: int) -> str:
+        return {
+            1: '1st',
+            2: '2nd',
+            3: '3rd',
+            4: '4th',
+            5: '5th'
+        }[order]

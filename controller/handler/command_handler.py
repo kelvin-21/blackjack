@@ -19,6 +19,7 @@ class CommandHandler():
         self.sim_viewer = sim_viewer
 
         self.sim_result = None
+        self.decision = None
         self.player_me = None
 
     def handle(self, arg: str, is_task: bool, game: Game) -> bool: # return bool: bypass
@@ -54,7 +55,7 @@ class CommandHandler():
 
     def handle_msg(self, arg: str, game: Game) -> str:
         
-        self.find_player_me(game.players)
+        self.player_me = game.get_player_me()
         msg = None
 
         if arg[:6] == '/hands':  # view all hands
@@ -84,18 +85,13 @@ class CommandHandler():
                 self.sim_result = self.simulator.run_simulation(game, self.player_me)
 
             if self.sim_result:
-                msg = self.sim_viewer.advice(self.sim_result)
+                self.decision = self.simulator.get_advice(game, self.player_me, self.sim_result)
+                msg = self.sim_viewer.advice(self.sim_result, self.decision)
             else:
                 logging.info('Not valid for simulation')
 
         return msg
 
-    def sim_result_clear_cache(self) -> None:
+    def clear_cache(self) -> None:
         self.sim_result = None
-
-    def find_player_me(self, players: List[Player]) -> None:
-        for player_i in players:
-            if player_i.name == 'Me':
-                self.player_me = player_i
-                return
-        raise ValueError('Player Me not found in the game players')
+        self.decision = None

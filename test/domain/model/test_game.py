@@ -1,5 +1,5 @@
 import unittest
-from domain.model import Game, Card, Hand, Suit, Rank, PlayerStatus, PlayerStatusReason, HandStatus
+from domain.model import Game, Card, Hand, Suit, Rank, PlayerStatus, PlayerStatusReason, HandStatus, Player
 from configuration import ConfigLoader
 from typing import List
 
@@ -199,6 +199,13 @@ class TestGame(unittest.TestCase):
         self.hand_value_helper(hand_21, hand_blackjack, PlayerStatus.WIN, PlayerStatusReason.BLACKJACK)
         self.hand_value_helper(hand_21, hand_fivecard, PlayerStatus.WIN, PlayerStatusReason.FIVECARD)
 
+    def test_get_player_me(self):
+        player_me = self.game.get_player_me()
+
+        self.assertIsNotNone(player_me)
+        self.assertIsInstance(player_me, Player)
+        self.assertEqual(player_me.name, 'Me')
+
     # helper function
     def player_status_helper(
         self, 
@@ -260,6 +267,7 @@ class TestGame(unittest.TestCase):
         suite.addTest(TestGame('distribute_random_card_from_empty_card_deck_then_return_false'))
         suite.addTest(TestGame('test_conclude_player_status'))
         suite.addTest(TestGame('test_conclude_player_status_hand_value'))
+        suite.addTest(TestGame('test_get_player_me'))
 
         runner = unittest.TextTestRunner()
         runner.run(suite)

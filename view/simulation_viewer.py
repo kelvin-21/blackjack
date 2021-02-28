@@ -60,9 +60,7 @@ class SimulationViewer():
         return msg
 
     @staticmethod
-    def advice(sim_result: dict) -> str:
-        decision = Simulator.get_advice(sim_result)
-
+    def advice(sim_result: dict, decision: Decision) -> str:
         sum_dict = Utilities.sum_nested_dict
         if decision:
             maximum = sum_dict(sim_result[decision][PlayerStatus.WIN]) / sum_dict(sim_result[decision])

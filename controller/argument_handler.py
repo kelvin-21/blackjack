@@ -45,7 +45,7 @@ class ArgumentHandler():
     # return generic result
     def handle(self, arg_task: ArgumentTask = None, msg: str ='Please input:'):
         self.bypass = False
-        self.command_handler.sim_result_clear_cache()
+        self.command_handler.clear_cache()
 
         if not arg_task:  # handle non-task
             self.is_task = False
