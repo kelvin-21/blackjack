@@ -32,6 +32,7 @@ class GameRecorder():
         self.df['player_hand'] = None
         self.df['player_status'] = None
         self.df['player_status_reason'] = None
+        self.df['dealer_hand_status'] = None
         self.df['num_card_remain'] = None
         self.df['num_player'] = None
         self.df['num_card_set'] = None
@@ -54,6 +55,7 @@ class GameRecorder():
             'player_hand'           : self.game_viewer.hand(player_me.hand),
             'player_status'         : player_me.status.value,
             'player_status_reason'  : player_me.status_reason.value,
+            'dealer_hand_status'           : game.dealer.hand.status.value,
             'num_card_remain'       : num_card_remain,
             'num_player'            : self.config_loader.num_player,
             'num_card_set'          : self.config_loader.num_card_set,
