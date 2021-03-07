@@ -45,13 +45,28 @@ class Simulator():
         if len(player.hand.hand_value) == 1 and player.hand.hand_value[0] <= 11:
             return Decision.REQUEST
 
+        
+
         # advise base on simulation result
         if not sim_result:
             sim_result = self.run_simulation(game, player)
         sum_dict = Utilities.sum_nested_dict
+        request_c = sum_dict(sim_result[Decision.REQUEST])
+        pass_c = sum_dict(sim_result[Decision.PASS])
         win_given_request_c = sum_dict(sim_result[Decision.REQUEST][PlayerStatus.WIN])
         win_given_pass_c = sum_dict(sim_result[Decision.PASS][PlayerStatus.WIN])
 
+        win_given_request_p = win_given_request_c / request_c
+        win_given_pass_p = win_given_pass_c / pass_c
+
+        # hand contains A rule
+        if len(player.hand.hand_value) == 2:
+            if win_given_pass_p > 0.6:
+                return Decision.PASS
+            if win_given_pass_p > 0.4 and win_given_request_p < 0.5:
+                return Decision.PASS
+
+        # basic rule
         if win_given_request_c > win_given_pass_c:
             return Decision.REQUEST
         elif win_given_request_c < win_given_pass_c:
