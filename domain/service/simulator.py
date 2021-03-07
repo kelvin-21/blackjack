@@ -45,8 +45,6 @@ class Simulator():
         if len(player.hand.hand_value) == 1 and player.hand.hand_value[0] <= 11:
             return Decision.REQUEST
 
-        
-
         # advise base on simulation result
         if not sim_result:
             sim_result = self.run_simulation(game, player)
@@ -61,7 +59,7 @@ class Simulator():
 
         # hand contains A rule
         if len(player.hand.hand_value) == 2:
-            if win_given_pass_p > 0.6:
+            if win_given_pass_p > 0.5:
                 return Decision.PASS
             if win_given_pass_p > 0.4 and win_given_request_p < 0.5:
                 return Decision.PASS
